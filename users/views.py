@@ -28,3 +28,33 @@ def login_user(request):
             return redirect('login')
     else:
         return render(request, 'login.html')
+
+def register_user(request):
+    if request.method == "POST":
+        username = request.POST['username']
+        email = request.POST['email']
+        password = request.POST['password']
+        password2 = request.POST['password2']
+        
+        if password == password2:
+            if User.objects.filter(username=username).exists():
+                messages.error(request, 'Username already exists')
+                return redirect('register')
+            elif User.objects.filter(email=email).exists():
+                messages.error(request, 'Email already exists')
+                return redirect('register')
+            else:
+                user = User.objects.create_user(username=username, email=email, password=password)
+                user.save()
+                login(request, user)
+                return redirect('/api/users/')
+        else:
+            messages.error(request, 'Passwords do not match')
+            return redirect('register')
+    else:
+        return render(request, 'register.html')
+
+def logout_user(request):
+    logout(request)
+    messages.success(request, 'You have been logged out successfully')
+    return redirect('login')
