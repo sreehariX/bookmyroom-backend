@@ -23,4 +23,5 @@ urlpatterns = [
     path('api/', include('hostels.urls')),
     path('api/', include('rooms.urls')),
     path('api/', include('users.urls')),
+    
 ]
