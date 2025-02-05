@@ -1,60 +1,65 @@
-from rest_framework import viewsets
-from django.shortcuts import render, redirect
+from rest_framework import viewsets, status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
 from .models import User
 from .serializers import UserSerializer
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from django.contrib.auth import authenticate, login, logout
-from django.contrib import messages
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-
+    
     def get_permissions(self):
         if self.action in ['create']:
             return [AllowAny()]
         return [IsAuthenticated()]
 
-def login_user(request):
-    if request.method=="POST":
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('/api/users/')
-        else:
-            messages.error(request, 'Username or password is incorrect')
-            return redirect('login')
-    else:
-        return render(request, 'login.html')
+class LoginView(TokenObtainPairView):
+    permission_classes = [AllowAny]
 
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def register_user(request):
-    if request.method == "POST":
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        password2 = request.POST['password2']
-        
-        if password == password2:
-            if User.objects.filter(username=username).exists():
-                messages.error(request, 'Username already exists')
-                return redirect('register')
-            elif User.objects.filter(email=email).exists():
-                messages.error(request, 'Email already exists')
-                return redirect('register')
-            else:
-                user = User.objects.create_user(username=username, email=email, password=password)
-                user.save()
-                login(request, user)
-                return redirect('/api/users/')
-        else:
-            messages.error(request, 'Passwords do not match')
-            return redirect('register')
-    else:
-        return render(request, 'register.html')
+    username = request.data.get('username')
+    email = request.data.get('email')
+    password = request.data.get('password')
+    password2 = request.data.get('password2')
+    
+    if password != password2:
+        return Response({'error': 'Passwords do not match'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if User.objects.filter(username=username).exists():
+        return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if User.objects.filter(email=email).exists():
+        return Response({'error': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    user = User.objects.create_user(username=username, email=email, password=password)
+    refresh = RefreshToken.for_user(user)
+    
+    return Response({
+        'access': str(refresh.access_token),
+        'refresh': str(refresh),
+        'user': {
+            'username': user.username,
+            'email': user.email
+        },
+        'message': 'Registration successful'
+    }, status=status.HTTP_201_CREATED)
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def logout_user(request):
-    logout(request)
-    messages.success(request, 'You have been logged out successfully')
-    return redirect('login')
+    try:
+        refresh_token = request.data.get("refresh")
+        if not refresh_token:
+            return Response({'error': 'Refresh token is required'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        token = RefreshToken(refresh_token)
+        token.blacklist()
+        return Response({'message': 'Successfully logged out'}, status=status.HTTP_200_OK)
+    except Exception:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
