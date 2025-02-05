@@ -39,12 +39,13 @@ class Booking(models.Model):
             if self.room.people_booked_moodIndigo > 0:
                 self.room.people_booked_moodIndigo -= 1
                 self.room.availability_status_moodIndigo = 'available'
+                # self.room.save()
 
         elif self.event == 'Techfest':
             if self.room.people_booked_techFest > 0:
                 self.room.people_booked_techFest -= 1
                 self.room.availability_status_techFest = 'available'
-
+                # self.room.save()
         self.room.save()
         super().delete(*args, **kwargs)
 
