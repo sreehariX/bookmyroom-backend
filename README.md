@@ -32,11 +32,42 @@ cd bookmyroom-backend
 pip install -r requirements.txt
 
 # Creating a superuser
+# username: admin
+# password: check123
 py manage.py createsuperuser
 
 # Run the backend
 py manage.py runserver
 ```
+
+## 🔑 Authentication Headers
+
+For protected endpoints, include these headers with your requests:
+
+```http
+Authorization: Bearer [access_token]
+Content-Type: application/json
+```
+
+### Header Requirements:
+
+1. Public Endpoints (No authentication required):
+
+- POST /api/login/
+- POST /api/register/
+
+2. Protected Endpoints (Authentication required):
+
+- All GET requests (except api/hostels/ and api/rooms/)
+- POST /api/bookings/
+- POST /api/logout/
+
+3. Admin-Only Endpoints (Authentication + Admin privileges required):
+
+- POST /api/hostels/
+- POST /api/rooms/
+- PUT/PATCH/DELETE requests to any endpoint
+  Note: Replace [access_token] with the JWT token received from login/register response.
 
 ## 📦 User APIs
 
@@ -237,17 +268,17 @@ This endpoint retrieves a list of all rooms with details such as room number, av
 ```json
 [
     {
-        "id": 1,
-        "available_capacity_moodIndigo": 4,
-        "available_capacity_techFest": 4,
-        "hostel_name": "1",
+        "id": 7,
+        "hostel_name_display": "16",
         "room_number": "101",
         "capacity": 4,
         "people_booked_moodIndigo": 0,
         "people_booked_techFest": 0,
         "availability_status_moodIndigo": "available",
+        "available_capacity_moodIndigo": 4,
         "availability_status_techFest": "available",
-        "hostel": 3 // hostel id
+        "available_capacity_techFest": 4,
+        "hostel": 5
     }, ...
 ]
 ```
@@ -260,7 +291,7 @@ This endpoint allows the creation of a new room in a specific hostel. Only autho
 
 ```json
 {
-  "room_number": "101",
+  "room_number": "102",
   "capacity": 4,
   "people_booked_moodIndigo": 0,
   "people_booked_techFest": 0,
@@ -276,14 +307,17 @@ If Successful,
 
 ```json
 {
-  "id": 1,
-  "room_number": "101",
+  "id": 8,
+  "hostel_name_display": "16",
+  "room_number": "102",
   "capacity": 4,
   "people_booked_moodIndigo": 0,
   "people_booked_techFest": 0,
   "availability_status_moodIndigo": "available",
+  "available_capacity_moodIndigo": 4,
   "availability_status_techFest": "available",
-  "hostel": "16"
+  "available_capacity_techFest": 4,
+  "hostel": 5
 }
 ```
 
@@ -305,32 +339,19 @@ This endpoint retrieves a list of all bookings for a specific event, displaying 
 
 ```json
 [
-    {
-        "event": "Mood Indigo",
-        "resident_name": "rohit",
-        "room": 3, // this is the room id
-        "user": {
-            "id": 5,
-            "username": "admin2",
-            "email": "",
-            "phone_number": null,
-            "event": "Mood Indigo"
-        }
+  {
+    "event": "Techfest",
+    "resident_name": "Arnav",
+    "room": 8,
+    "user": {
+      "id": 1,
+      "username": "admin",
+      "email": "",
+      "phone_number": null,
+      "event": "Mood Indigo"
     }
-    {
-        "event": "Mood Indigo",
-        "resident_name": "mohit",
-        "room": 4,
-        "user": {
-            "id": 5,
-            "username": "admin2",
-            "email": "",
-            "phone_number": null,
-            "event": "Mood Indigo"
-        }
-    }
+  }
 ]
-
 ```
 
 ### 2. **POST /api/bookings/**
@@ -341,7 +362,7 @@ This API is used to create a new booking for an event. The user must provide the
 
 ```json
 {
-  "event": "Techfest", // (e.g., "Techfest", "Mood Indigo")
+  "event": "Mood Indigo", // (e.g., "Techfest", "Mood Indigo")
   "resident_name": "Arnav", // Name of the person who is going to stay
   "hostel_name": "16", // Name of the hostel where the room is located
   "room_number": "101" // Room number in the specified hostel
@@ -356,21 +377,13 @@ If Successful,
 {
   "event": "Mood Indigo",
   "resident_name": "Arnav",
-  "room": 3, // Room id associated with the room
+  "room": 7,
   "user": {
-    "id": 5,
-    "username": "admin2",
+    "id": 1,
+    "username": "admin",
     "email": "",
-    "phone_number": "1234567890",
+    "phone_number": null,
     "event": "Mood Indigo"
   }
-}
-```
-
-In case of missing or invalid fields:
-
-```json
-{
-  "error": "Invalid input, please check the fields."
 }
 ```
