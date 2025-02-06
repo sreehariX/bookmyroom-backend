@@ -15,7 +15,7 @@ Our backend has functionality for hostels, rooms, bookings and users.
 
 - **Backend**: Django
 - **Database**: SQLite
-- **Authentication**: Django's default session-based authentication
+- **Authentication**: JWT Authentication
 
 ---
 
@@ -91,18 +91,24 @@ This endpoint allows a new user to register. You must provide the required detai
 
 ```json
 {
-  "message": "Registration successful, user logged in."
+  "access": "[access_token]",
+  "refresh": "[refresh_token]",
+  "user": {
+    "username": "newUser123",
+    "email": "newuser123@example.com"
+  },
+  "message": "Registration successful"
 }
 ```
 
 If any validation fails, an error message is returned.
 
 ```json
-"message": "Username already exists"
+"error": "Username already exists"
 or
-"message": "Email already exists"
+"error": "Email already exists"
 or
-"message": "Passwords do not match"
+"error": "Passwords do not match"
 ```
 
 ### 3. **POST /api/login/**
@@ -113,7 +119,7 @@ This endpoint allows users to log in to the platform using their **username** an
 
 ```json
 {
-  "username": "testUser1",
+  "username": "newUser123",
   "password": "password123"
 }
 ```
@@ -122,7 +128,8 @@ This endpoint allows users to log in to the platform using their **username** an
 
 ```json
 {
-  "message": "Login successful"
+  "refresh": "[refresh_token]",
+  "access": "[acess_token]"
 }
 ```
 
@@ -130,7 +137,7 @@ OR, for invalid credentials :
 
 ```json
 {
-  "message": "Username or password is incorrect"
+  "detail": "No active account found with the given credentials"
 }
 ```
 
@@ -138,13 +145,21 @@ OR, for invalid credentials :
 
 This endpoint allows users to log out of the platform.
 
+#### **Request Body**
+
+```json
+{
+  "refresh": "[refresh_token]"
+}
+```
+
 #### **Response**
 
 If the user is logged out successfully:
 
 ```json
 {
-  "message": "You have been logged out successfully"
+  "message": "Successfully logged out"
 }
 ```
 
@@ -160,35 +175,19 @@ This endpoint retrieves a list of all hostels with details such as available roo
 [
   {
     "id": 1,
-    "total_available_rooms": 4,
+    "total_available_rooms": 100,
     "name": "1",
     "location": "near sac",
-    "total_rooms": 300,
+    "total_rooms": 100,
     "hostel_type": "Male"
   },
   {
     "id": 2,
-    "total_available_rooms": 3,
-    "name": "16",
-    "location": "very far",
-    "total_rooms": 1024,
-    "hostel_type": "Male"
-  },
-  {
-    "id": 3,
-    "total_available_rooms": 4,
-    "name": "15",
-    "location": "very far",
-    "total_rooms": 1024,
-    "hostel_type": "Female"
-  },
-  {
-    "id": 4,
     "total_available_rooms": 2,
-    "name": "10",
-    "location": "Near Gate",
-    "total_rooms": 1000,
-    "hostel_type": "Female"
+    "name": "16",
+    "location": "near h15",
+    "total_rooms": 100,
+    "hostel_type": "Male"
   }
 ]
 ```

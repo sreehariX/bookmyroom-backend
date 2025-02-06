@@ -2,11 +2,10 @@ from rest_framework import serializers
 from .models import Hostel
 
 class HostelSerializer(serializers.ModelSerializer):
-    total_available_rooms = serializers.SerializerMethodField()
-
     class Meta:
         model = Hostel
-        fields = '__all__'
+        fields = ['id', 'name', 'location', 'hostel_type', 'total_rooms']
+        read_only_fields = ['total_rooms']
 
     def get_total_available_rooms(self, obj):
         return obj.rooms.filter(

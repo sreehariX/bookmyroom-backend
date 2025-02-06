@@ -2,6 +2,7 @@ from django.db import models
 from hostels.models import Hostel
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 class Room(models.Model):
     HOSTEL_TYPE_CHOICES = [
@@ -52,3 +53,10 @@ def update_room_on_booking_delete(sender, instance, **kwargs):
         if room.people_booked_techFest < room.capacity:
             room.availability_status_techFest = 'available'
         room.save()
+
+@receiver(post_save, sender=Room)
+def update_hostel_room_count(sender, instance, created, **kwargs):
+    if created:  
+        hostel = instance.hostel
+        hostel.total_rooms += 1
+        hostel.save()
