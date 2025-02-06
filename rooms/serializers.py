@@ -7,10 +7,11 @@ class RoomSerializer(serializers.ModelSerializer):
     available_capacity_techFest = serializers.SerializerMethodField()
     hostel_name = serializers.CharField(write_only=True)
     hostel = serializers.PrimaryKeyRelatedField(read_only=True)
+    hostel_name_display = serializers.SerializerMethodField()
 
     class Meta:
         model = Room
-        fields = ['id', 'room_number', 'capacity', 'people_booked_moodIndigo', 
+        fields = ['id','hostel_name_display', 'room_number', 'capacity', 'people_booked_moodIndigo', 
                  'people_booked_techFest', 'availability_status_moodIndigo',
                 'available_capacity_moodIndigo','availability_status_techFest',
                  'available_capacity_techFest', 'hostel', 'hostel_name']
@@ -20,6 +21,9 @@ class RoomSerializer(serializers.ModelSerializer):
 
     def get_available_capacity_techFest(self, obj):
         return obj.capacity - obj.people_booked_techFest
+
+    def get_hostel_name_display(self, obj):
+        return obj.hostel.name
 
     def create(self, validated_data):
         hostel_name = validated_data.pop('hostel_name')

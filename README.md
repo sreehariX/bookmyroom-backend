@@ -175,19 +175,17 @@ This endpoint retrieves a list of all hostels with details such as available roo
 [
   {
     "id": 1,
-    "total_available_rooms": 100,
     "name": "1",
     "location": "near sac",
-    "total_rooms": 100,
-    "hostel_type": "Male"
+    "hostel_type": "Male",
+    "total_rooms": 165
   },
   {
     "id": 2,
-    "total_available_rooms": 2,
-    "name": "16",
-    "location": "near h15",
-    "total_rooms": 100,
-    "hostel_type": "Male"
+    "name": "2",
+    "location": "near court",
+    "hostel_type": "Male",
+    "total_rooms": 203
   }
 ]
 ```
@@ -200,9 +198,8 @@ This endpoint allows **superusers (admins)** to create a new hostel.
 
 ```json
 {
-  "name": "10", // Hostel name/number
+  "name": "10", // Hostel number
   "location": "Near Gate",
-  "total_rooms": 500,
   "hostel_type": "Female"
 }
 ```
@@ -213,7 +210,11 @@ If Successful,
 
 ```json
 {
-  "message": "Hostel created successfully"
+  "id": 3,
+  "name": "10",
+  "location": "Near Gate",
+  "hostel_type": "Female",
+  "total_rooms": 0
 }
 ```
 
@@ -235,45 +236,19 @@ This endpoint retrieves a list of all rooms with details such as room number, av
 
 ```json
 [
-  {
-    "id": 1,
-    "available_capacity_moodIndigo": 1,
-    "available_capacity_techFest": 3,
-    "hostel_name": "16",
-    "room_number": "101",
-    "capacity": 3,
-    "people_booked_moodIndigo": 2,
-    "people_booked_techFest": 0,
-    "availability_status_moodIndigo": "available",
-    "availability_status_techFest": "available",
-    "hostel": 3
-  },
-  {
-    "id": 2,
-    "available_capacity_moodIndigo": 0,
-    "available_capacity_techFest": 3,
-    "hostel_name": "16",
-    "room_number": "102",
-    "capacity": 3,
-    "people_booked_moodIndigo": 3,
-    "people_booked_techFest": 0,
-    "availability_status_moodIndigo": "booked",
-    "availability_status_techFest": "available",
-    "hostel": 3
-  },
-  {
-    "id": 3,
-    "available_capacity_moodIndigo": 3,
-    "available_capacity_techFest": 3,
-    "hostel_name": "1",
-    "room_number": "101",
-    "capacity": 3,
-    "people_booked_moodIndigo": 0,
-    "people_booked_techFest": 0,
-    "availability_status_moodIndigo": "available",
-    "availability_status_techFest": "available",
-    "hostel": 2
-  }
+    {
+        "id": 1,
+        "available_capacity_moodIndigo": 4,
+        "available_capacity_techFest": 4,
+        "hostel_name": "1",
+        "room_number": "101",
+        "capacity": 4,
+        "people_booked_moodIndigo": 0,
+        "people_booked_techFest": 0,
+        "availability_status_moodIndigo": "available",
+        "availability_status_techFest": "available",
+        "hostel": 3 // hostel id
+    }, ...
 ]
 ```
 
@@ -291,7 +266,7 @@ This endpoint allows the creation of a new room in a specific hostel. Only autho
   "people_booked_techFest": 0,
   "availability_status_moodIndigo": "available",
   "availability_status_techFest": "available",
-  "hostel": "16"
+  "hostel_name": "16"
 }
 ```
 
