@@ -31,7 +31,8 @@ class Room(models.Model):
 
     def __str__(self):
         return f"{self.room_number} - {self.hostel.name} (MI: {self.availability_status_moodIndigo} ({self.capacity-self.people_booked_moodIndigo}), TF: {self.availability_status_techFest} ({self.capacity-self.people_booked_techFest}))"
- 
+
+@receiver(pre_delete, sender=Room)
 def update_hostel_on_room_delete(sender, instance, **kwargs):
     hostel = instance.hostel
     if hostel.total_rooms > 0:
