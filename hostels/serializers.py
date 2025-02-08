@@ -4,7 +4,7 @@ from .models import Hostel
 class HostelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hostel
-        fields = ['id', 'name', 'location', 'hostel_type', 'total_rooms']
+        fields = ['id', 'name', 'location', 'hostel_type', 'total_rooms', 'price_per_booking']
         read_only_fields = ['total_rooms']
 
     def get_total_available_rooms(self, obj):

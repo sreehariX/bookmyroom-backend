@@ -209,14 +209,16 @@ This endpoint retrieves a list of all hostels with details such as available roo
     "name": "1",
     "location": "near sac",
     "hostel_type": "Male",
-    "total_rooms": 165
+    "total_rooms": 165,
+    "price_per_booking": "500.00"
   },
   {
     "id": 2,
     "name": "2",
     "location": "near court",
     "hostel_type": "Male",
-    "total_rooms": 203
+    "total_rooms": 203,
+    "price_per_booking": "500.00"
   }
 ]
 ```
@@ -231,7 +233,8 @@ This endpoint allows **superusers (admins)** to create a new hostel.
 {
   "name": "10", // Hostel number
   "location": "Near Gate",
-  "hostel_type": "Female"
+  "hostel_type": "Female",
+  "price_per_booking": "750.00"
 }
 ```
 
@@ -245,7 +248,8 @@ If Successful,
   "name": "10",
   "location": "Near Gate",
   "hostel_type": "Female",
-  "total_rooms": 0
+  "total_rooms": 0,
+  "price_per_booking": "750.00"
 }
 ```
 
